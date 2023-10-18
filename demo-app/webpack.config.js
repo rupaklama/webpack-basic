@@ -16,9 +16,11 @@ module.exports = {
   },
   mode: "none",
 
-  // asset modules config
-  // note: webpack will throw error if no rules when importing modules
+  // note: 'module' property contain 'rules' which is a rule for every file type / extension
+  // webpack will throw error if no rules found when importing modules
   module: {
+    // note: 'test' property identifies which file or files should be transformed.
+    // 'use' property indicates which Loader should be used to do the transforming.
     rules: [
       {
         // regex to match png/jpg files
@@ -62,6 +64,26 @@ module.exports = {
         // 4. asset/source - converts source code/text into strings to inject in js bundle
         test: /\.txt/,
         type: "asset/source",
+      },
+
+      // note: Loaders allow to import all Kinds of files that can’t be import with Asset Modules.
+      // eg. css, sass, less, xml etc
+      // note: Loaders needs to be Install explicitly
+      {
+        test: /\.css$/,
+        use: [
+          // note: using one or more loaders to transform the file
+          // 'style-loader' injects css into the page using style text with js into js bundle,
+          // 'css-loader' reads the file content & returns it
+          "style-loader",
+          "css-loader",
+        ],
+      },
+
+      {
+        test: /\.scss$/,
+        // note: Webpack processes loaders from Right to Left '<--', so the orders matter
+        use: ["style-loader", "css-loader", "sass-loader"],
       },
     ],
   },
