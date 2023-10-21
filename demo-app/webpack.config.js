@@ -5,18 +5,39 @@ const path = require("path");
 // this plugins comes out of box with webpack5
 const TerserPlugin = require("terser-webpack-plugin");
 
-// this needs to be installed
+// these plugins need to be installed
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+// const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: "./src/index.js",
   output: {
-    filename: "bundle.js",
+    // note: The best practice is to add 'MD5 Hash' to the name of the file on implementing 'Caching'
+    // This MD5 Hash depends on the content of the file so that the
+    // webpack will only generate new file name if there is any new changes in the file.
+    // If one character is modified or deleted from the data contained in a file,
+    // its MD5 hash code will be completely different than the original MD5 hash code.
+    // note: Changing a file name won't effect the MD5 Hash of a file, effected on content change only
+
+    // filename: "bundle.js",
+    // note: add '.[contenthash].' to the output file name in order for MD5 Hash to work
+    filename: "bundle.[contenthash].js",
+
+    // NOTE: Use 'html-webpack-plugin' to link MD5 Hash file to scripts tags in index.html
+    // This is a webpack plugin that simplifies creation of HTML files to serve your webpack bundles.
+    // This is especially useful for webpack bundles that include a hash in the filename
+    // which changes every compilation.
+
+    // note: to remove previous build files or move to another dir before generating new bundles
+    // output.clean option does not clean the output directory when running webpack-dev-server with writeToDisk: true.
+    clean: true,
+
     path: path.resolve(__dirname, "./dist"),
     // publicPath tells webpack which specific output url to use to load the file
     // note: webpack 5 sets its value to 'auto' by default, sets the path to display the file.
     // Version 4 or less is set to ''. Must need to specify the Out Dir to set the relative path to the file.
-    publicPath: "dist/",
+    publicPath: "",
     // note: useful when serving file from cdn
     // publicPath: "http://some-cdn.com",
   },
@@ -130,7 +151,21 @@ module.exports = {
     new MiniCssExtractPlugin({
       // assigning file name
       // note: need to modify the rules in css & scss loaders in order to use plugin
-      filename: "styles.css",
+      // filename: "styles.css",
+
+      // note: add '.[contenthash].' to the output file name in order for MD5 Hash to work
+      filename: "styles.[contenthash].css",
     }),
+
+    // note: webpack plugin to remove/clean build folders eg. to remove previous build files as a whole
+    // This will ensure that it has clean folder before creating a new dist dir on every time
+    // new CleanWebpackPlugin(),
+    // NOTE: This plugin won't work with webpack 5
+
+    // NOTE: Use 'html-webpack-plugin' to link MD5 Hash file to scripts tags in index.html
+    // This is a webpack plugin that simplifies creation of HTML files to serve your webpack bundles.
+    // This is especially useful for webpack bundles that include a hash in the filename
+    // which changes every compilation.
+    new HtmlWebpackPlugin(),
   ],
 };

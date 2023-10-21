@@ -6,3 +6,5 @@ const helloWorldButton = new HelloWorldButton();
 
 heading.render();
 helloWorldButton.render();
+
+console.log("md5 works now");
