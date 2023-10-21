@@ -2,6 +2,12 @@
 // node module to generate absolute path
 const path = require("path");
 
+// this plugins comes out of box with webpack5
+const TerserPlugin = require("terser-webpack-plugin");
+
+// this needs to be installed
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
 module.exports = {
   entry: "./src/index.js",
   output: {
@@ -75,7 +81,9 @@ module.exports = {
           // note: using one or more loaders to transform the file
           // 'style-loader' injects css into the page using style text with js into js bundle,
           // 'css-loader' reads the file content & returns it
-          "style-loader",
+
+          // "style-loader", "css-loader",
+          MiniCssExtractPlugin.loader,
           "css-loader",
         ],
       },
@@ -83,8 +91,46 @@ module.exports = {
       {
         test: /\.scss$/,
         // note: Webpack processes loaders from Right to Left '<--', so the orders matter
-        use: ["style-loader", "css-loader", "sass-loader"],
+        use: [
+          // "style-loader", "css-loader", "sass-loader"],
+          MiniCssExtractPlugin.loader,
+          "css-loader",
+          "sass-loader",
+        ],
+      },
+
+      {
+        // note: webpack will use 'babel-loader' when importing js files & converts modern js code into es5
+        test: /\.js$/,
+        use: {
+          loader: "babel-loader",
+          // need to specify extra options
+          options: {
+            // need special babel preset which compiles es6,7,8,9... etc to es5
+            // In other words, babel env presets supports latest js es code
+            presets: ["@babel/env"],
+            plugins: ["@babel/plugin-proposal-class-properties"],
+          },
+        },
       },
     ],
   },
+  // note: plugin is a js library that adds functionality to the webpack itself
+  // plugin can also modify how the bundles themselves are created eg. code splitting
+  // There will always be new features (not supported out-of-the-box) that needs to be enable
+  // by installing related plugins to support those features here.
+  plugins: [
+    // creating instance of TerserPlugin for bundle minification to reduce bundle size
+    new TerserPlugin(),
+
+    // NOTE: css will be dynamically added into single js bundle file during run time by javascript
+    // Not a great solution for production. Our js bundle will be very large. Large file will need more time to load.
+    // The best solution is to extract all our css code into separate file which will be generated
+    // along same time with JS bundle. This way we have two bundles instead of one.
+    new MiniCssExtractPlugin({
+      // assigning file name
+      // note: need to modify the rules in css & scss loaders in order to use plugin
+      filename: "styles.css",
+    }),
+  ],
 };
