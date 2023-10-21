@@ -3,7 +3,7 @@
 const path = require("path");
 
 // this plugins comes out of box with webpack5
-const TerserPlugin = require("terser-webpack-plugin");
+// const TerserPlugin = require("terser-webpack-plugin");
 
 // these plugins need to be installed
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -21,6 +21,7 @@ module.exports = {
     // note: Changing a file name won't effect the MD5 Hash of a file, effected on content change only
 
     // filename: "bundle.js",
+    // This Caching feature is only require in 'production' mode
     // note: add '.[contenthash].' to the output file name in order for MD5 Hash to work
     filename: "bundle.[contenthash].js",
 
@@ -41,7 +42,19 @@ module.exports = {
     // note: useful when serving file from cdn
     // publicPath: "http://some-cdn.com",
   },
-  mode: "none",
+
+  // note: Usually Production Build require different build than Development Builds.
+  // In production, we want our build as fast as possible and our bundle should be as small as possible.
+  // In development, we often want to see additional information inside our javascript code. eg. source file
+  // mode: "none" - Opts out of any default optimization options
+
+  // note: 'production' mode enables long list of different plugins including TerserPlugin
+  // Sets process.env.NODE_ENV variable to production
+  // mode: "production",
+
+  // note: on 'production' mode, the error is displayed from the bundle file if error exists
+  // note: on 'development' mode, the error is displayed more clearly from the js source map file if error exists
+  mode: "production",
 
   // note: 'module' property contain 'rules' which is a rule for every file type / extension
   // webpack will throw error if no rules found when importing modules
@@ -148,7 +161,8 @@ module.exports = {
   // by installing related plugins to support those features here.
   plugins: [
     // creating instance of TerserPlugin for bundle minification to reduce bundle size
-    new TerserPlugin(),
+    // note: In production mode, this plugin will be included by default.
+    // new TerserPlugin(),
 
     // NOTE: css will be dynamically added into single js bundle file during run time by javascript
     // Not a great solution for production. Our js bundle will be very large. Large file will need more time to load.
