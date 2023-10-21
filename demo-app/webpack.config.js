@@ -29,7 +29,7 @@ module.exports = {
     // This is especially useful for webpack bundles that include a hash in the filename
     // which changes every compilation.
 
-    // note: to remove previous build files or move to another dir before generating new bundles
+    // note: to remove previous build files dir or move to another dir before generating new bundles
     // output.clean option does not clean the output directory when running webpack-dev-server with writeToDisk: true.
     clean: true,
 
@@ -134,6 +134,12 @@ module.exports = {
           },
         },
       },
+
+      {
+        // handler bars template
+        test: /\.hbs$/,
+        use: ["handlebars-loader"],
+      },
     ],
   },
   // note: plugin is a js library that adds functionality to the webpack itself
@@ -166,6 +172,17 @@ module.exports = {
     // This is a webpack plugin that simplifies creation of HTML files to serve your webpack bundles.
     // This is especially useful for webpack bundles that include a hash in the filename
     // which changes every compilation.
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      // customizing auto generated index.html contents
+      title: "Webpack 5",
+      // meta: {
+      //   description: "Learn Webpack5 now!",
+      // },
+
+      // rendering Handlebars template instead of the default webpack generated  html template
+      // note: added rules above on how to handle it
+      template: "src/index.hbs",
+      description: "Learn Webpack5 right now!",
+    }),
   ],
 };
